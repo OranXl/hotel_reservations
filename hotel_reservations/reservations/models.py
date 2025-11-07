@@ -11,8 +11,8 @@ class Hotel(models.Model):
         return f'Hotel {self.id} - {self.description[:20]}'
 
 class Reservations(models.Model):
-    start_date = models.DateField(auto_now_add=False)
-    end_date = models.DateField(auto_now_add=False)
+    date_start = models.DateField(auto_now=False, auto_now_add=False)
+    date_end = models.DateField(auto_now=False, auto_now_add=False)
     hotel_id = models.ForeignKey(
         Hotel,
         on_delete=models.CASCADE,
@@ -21,4 +21,4 @@ class Reservations(models.Model):
     )
 
     def __str__(self):
-        return f'Reservation {self.id} for Hotel {self.hotel.id}'
+        return f'Reservation {self.id} for Hotel {self.hotel_id}'
