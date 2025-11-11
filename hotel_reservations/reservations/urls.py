@@ -38,6 +38,7 @@ urlpatterns = [
     path('reservation/api', views.ReservationAPIView.as_view()),
     path('reservation/api/<int:pk>', views.ReservationAPIView.as_view()),
 
+    # Swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
 ]

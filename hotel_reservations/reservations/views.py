@@ -2,20 +2,12 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
-# from mako.testing.exclusions import requires_no_pygments_exceptions
 from .models import *
 from .serializers import HotelSerializer, ReservationsSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from .swagger_decorators import *
 
-# quick_hotel_get = swagger_auto_schema(operation_description="Получить список отелей с сортировкой")
-# quick_hotel_post = swagger_auto_schema(operation_description="Создать отель")
-# quick_reservation_get = swagger_auto_schema(operation_description="Получить список бронирований")
-# quick_reservation_post = swagger_auto_schema(operation_description="Создать бронирование")
-# quick_delete = swagger_auto_schema(operation_description="Удалить запись")
-#
-#
 
 
 
@@ -78,17 +70,24 @@ def res_del(request, pk):
 
 class HotelAPIView(APIView):
     @hotel_list_get_schema
-
     def get(self, request):
         hotels = Hotel.objects.all()
 
         sort_by = request.GET.get('sort_by', 'create_at')
         order = request.GET.get('order', 'desc')
 
+        # Используем параметр sort_by из запроса
+        if sort_by == 'price':
+            sort_field = 'price'
+        else:  # по умолчанию сортируем по create_at
+            sort_field = 'create_at'
+
+        # Применяем сортировку
         if order == 'asc':
-            hotels = hotels.order_by('create_at')
+            hotels = hotels.order_by(sort_field)
         else:
-            hotels = hotels.order_by('-create_at')
+            hotels = hotels.order_by(f'-{sort_field}')
+            
         data = [{
             'id': hotel.id,
             'description': hotel.description,
@@ -96,27 +95,6 @@ class HotelAPIView(APIView):
             'create_at': hotel.create_at.isoformat() if hotel.create_at else None
         } for hotel in hotels]
         return Response({'hotels': data})
-
-    @hotel_list_post_schema
-    def post(self, request):
-        serializer = HotelSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        hotel = serializer.save()  # Сохраняем и получаем объект
-
-        return Response({
-            'hotel': {
-                'id': hotel.id,  # Используем объект hotel, а не serializer
-                'description': hotel.description,
-                'price': str(hotel.price), 
-                'create_at': hotel.create_at.isoformat() if hotel.create_at else None
-            }})
-
-    @hotel_delete_schema
-    def delete(self, request, pk):
-        hotel = Hotel.objects.get(pk=pk)
-        hotel.delete()
-        return Response({"Hotel": "Delete Hotel №" + str(pk)})
-
 
 class ReservationAPIView(APIView):
 
