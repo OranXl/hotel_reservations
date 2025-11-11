@@ -11,6 +11,7 @@ class HotelSerializer(serializers.ModelSerializer):
 
 
 class ReservationsSerializer(serializers.ModelSerializer):
+    class Meta:
         model = Reservations
         fields = '__all__'
         read_only_fields = ['id']

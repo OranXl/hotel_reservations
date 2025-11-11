@@ -14,5 +14,8 @@ urlpatterns = [
     path('reservation/<int:pk>/delete', views.res_del, name='reservations_del'),
     # API
     path('hotel/api', views.HotelAPIView.as_view()),
+    path('hotel/api/<int:pk>', views.HotelAPIView.as_view()),
     path('reservation/api', views.ReservationAPIView.as_view()),
+    path('reservation/api/<int:pk>', views.ReservationAPIView.as_view()),
+
 ]

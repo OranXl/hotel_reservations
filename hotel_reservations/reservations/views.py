@@ -8,8 +8,6 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 
-
-
 # Create your views here.
 def hotel_list(request):
     hotels = Hotel.objects.all()
@@ -70,14 +68,20 @@ def res_del(request, pk):
 class HotelAPIView(APIView):
     def get(self, request):
         hotels = Hotel.objects.all()
-        
+
+        sort_by = request.GET.get('sort_by', 'create_at')
+        order = request.GET.get('order', 'desc')
+
+        if order == 'asc':
+            hotels = hotels.order_by('create_at')
+        else:
+            hotels = hotels.order_by('-create_at')
         data = [{
             'id': hotel.id,
             'description': hotel.description,
             'price': str(hotel.price), 
             'create_at': hotel.create_at.isoformat() if hotel.create_at else None
         } for hotel in hotels]
-        
         return Response({'hotels': data})
     
     def post(self, request):
@@ -91,12 +95,17 @@ class HotelAPIView(APIView):
                 'description': hotel.description,
                 'price': str(hotel.price), 
                 'create_at': hotel.create_at.isoformat() if hotel.create_at else None
-            }
-        })
+            }})
+
+    def delete(self, request, pk):
+        hotel = Hotel.objects.get(pk=pk)
+        hotel.delete()
+        return Response({"Hotel": "Delete Hotel №" + str(pk)})
+
 
 class ReservationAPIView(APIView):
-    def get(self, request):
-        reservations = Reservations.objects.all()
+    def get(self, request, pk):
+        reservations = Reservations.objects.filter(hotel=pk).order_by('date_start')
 
         data = [{
             'id': reservation.id,
@@ -121,3 +130,8 @@ class ReservationAPIView(APIView):
                 'hotel': reservation.hotel.id if reservation.hotel else None
             }
         }, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, pk):
+        reservations = Reservations.objects.get(pk=pk)
+        reservations.delete()
+        return Response({"reservation": "Delete reservation №" + str(pk)})
