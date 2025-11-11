@@ -1,11 +1,22 @@
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 # from mako.testing.exclusions import requires_no_pygments_exceptions
 from .models import *
 from .serializers import HotelSerializer, ReservationsSerializer
 from rest_framework.views import APIView
 from rest_framework import status
+from .swagger_decorators import *
+
+# quick_hotel_get = swagger_auto_schema(operation_description="Получить список отелей с сортировкой")
+# quick_hotel_post = swagger_auto_schema(operation_description="Создать отель")
+# quick_reservation_get = swagger_auto_schema(operation_description="Получить список бронирований")
+# quick_reservation_post = swagger_auto_schema(operation_description="Создать бронирование")
+# quick_delete = swagger_auto_schema(operation_description="Удалить запись")
+#
+#
+
 
 
 # Create your views here.
@@ -66,6 +77,8 @@ def res_del(request, pk):
 
 
 class HotelAPIView(APIView):
+    @hotel_list_get_schema
+
     def get(self, request):
         hotels = Hotel.objects.all()
 
@@ -83,7 +96,8 @@ class HotelAPIView(APIView):
             'create_at': hotel.create_at.isoformat() if hotel.create_at else None
         } for hotel in hotels]
         return Response({'hotels': data})
-    
+
+    @hotel_list_post_schema
     def post(self, request):
         serializer = HotelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -97,6 +111,7 @@ class HotelAPIView(APIView):
                 'create_at': hotel.create_at.isoformat() if hotel.create_at else None
             }})
 
+    @hotel_delete_schema
     def delete(self, request, pk):
         hotel = Hotel.objects.get(pk=pk)
         hotel.delete()
@@ -104,6 +119,8 @@ class HotelAPIView(APIView):
 
 
 class ReservationAPIView(APIView):
+
+    @reservation_list_get_schema
     def get(self, request, pk):
         reservations = Reservations.objects.filter(hotel=pk).order_by('date_start')
 
@@ -115,7 +132,8 @@ class ReservationAPIView(APIView):
         } for reservation in reservations] 
         
         return Response({'reservations': data})
-    
+
+    @reservation_list_post_schema
     def post(self, request):
         serializer = ReservationsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -131,6 +149,7 @@ class ReservationAPIView(APIView):
             }
         }, status=status.HTTP_201_CREATED)
 
+    @reservation_delete_schema
     def delete(self, request, pk):
         reservations = Reservations.objects.get(pk=pk)
         reservations.delete()
