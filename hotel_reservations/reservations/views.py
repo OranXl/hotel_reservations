@@ -1,9 +1,8 @@
 from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
-from drf_yasg.utils import swagger_auto_schema
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from .models import *
-from .serializers import HotelSerializer, ReservationsSerializer
+from .models import Hotel, Reservations
+from .serializers import ReservationsSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from .swagger_decorators import *
