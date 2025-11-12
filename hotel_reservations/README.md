@@ -1,8 +1,7 @@
 # hotel_reservations
 ---Запуск---
-    Директория /hotel_reservations/hotel_reservations
-    poetry shell
-    python manage.py runserver
+    docker-compose up --build
+
 
 ---Тестирование---
     ---Hotel---

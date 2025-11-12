@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .models import Hotel, Reservations
-from .serializers import ReservationsSerializer
+from .serializers import ReservationsSerializer, HotelSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from .swagger_decorators import *
@@ -75,13 +75,11 @@ class HotelAPIView(APIView):
         sort_by = request.GET.get('sort_by', 'create_at')
         order = request.GET.get('order', 'desc')
 
-        # Используем параметр sort_by из запроса
         if sort_by == 'price':
             sort_field = 'price'
-        else:  # по умолчанию сортируем по create_at
+        else:
             sort_field = 'create_at'
 
-        # Применяем сортировку
         if order == 'asc':
             hotels = hotels.order_by(sort_field)
         else:
@@ -94,6 +92,26 @@ class HotelAPIView(APIView):
             'create_at': hotel.create_at.isoformat() if hotel.create_at else None
         } for hotel in hotels]
         return Response({'hotels': data})
+
+    @hotel_list_post_schema
+    def post(self, request):
+        serializer = HotelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        hotel = serializer.save()  # Сохраняем и получаем объект
+
+        return Response({
+            'hotel': {
+                'id': hotel.id,  # Используем объект hotel, а не serializer
+                'description': hotel.description,
+                'price': str(hotel.price),
+                'create_at': hotel.create_at.isoformat() if hotel.create_at else None
+            }})
+
+    @hotel_delete_schema
+    def delete(self, request, pk):
+        hotel = Hotel.objects.get(pk=pk)
+        hotel.delete()
+        return Response({"Hotel": "Delete Hotel №" + str(pk)})
 
 class ReservationAPIView(APIView):
 
