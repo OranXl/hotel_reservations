@@ -1,3 +1,0 @@
-ignore = ["F405", "F403"]
-
-per-file-ignores = {}
