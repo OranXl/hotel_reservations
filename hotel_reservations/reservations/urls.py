@@ -33,10 +33,10 @@ urlpatterns = [
     path('reservation/<int:pk>/delete', views.res_del, name='reservations_del'),
 
     # API
-    path('hotel/api', views.HotelAPIView.as_view()),
-    path('hotel/api/<int:pk>', views.HotelAPIView.as_view()),
-    path('reservation/api', views.ReservationAPIView.as_view()),
-    path('reservation/api/<int:pk>', views.ReservationAPIView.as_view()),
+    path('api/hotel', views.HotelAPIView.as_view()),
+    path('api/hotel/<int:pk>', views.HotelAPIView.as_view()),
+    path('api/reservation', views.ReservationAPIView.as_view()),
+    path('api/reservation/<int:pk>', views.ReservationAPIView.as_view()),
 
     # Swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

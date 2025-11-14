@@ -97,11 +97,11 @@ class HotelAPIView(APIView):
     def post(self, request):
         serializer = HotelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        hotel = serializer.save()  # Сохраняем и получаем объект
+        hotel = serializer.save()
 
         return Response({
             'hotel': {
-                'id': hotel.id,  # Используем объект hotel, а не serializer
+                'id': hotel.id,
                 'description': hotel.description,
                 'price': str(hotel.price),
                 'create_at': hotel.create_at.isoformat() if hotel.create_at else None
